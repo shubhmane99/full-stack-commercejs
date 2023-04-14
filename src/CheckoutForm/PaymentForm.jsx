@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Button, Divider,CircularProgress ,Link} from '@mui/material';
 import { Elements, CardElement, ElementsConsumer} from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -9,8 +9,10 @@ const stripePromise = loadStripe("pk_test_51MqIfDSHBLtZ1vQecAzOjz9T5aOs0jwDM8B8U
 
 const PaymentForm = ({ checkoutToken, nextStep, backStep, shippingData, onCaptureCheckout,setOrder }) => {
   console.log("shipping data",shippingData);
+  const [isDisable,setDisable] = useState(false);
   const handleSubmit = async (event, elements, stripe) => {
     event.preventDefault();
+    setDisable(true)
     let orderDetails;
     if (!stripe || !elements) return;
 
@@ -62,7 +64,9 @@ const PaymentForm = ({ checkoutToken, nextStep, backStep, shippingData, onCaptur
            },
          }
          );
+        
          setOrder(orderDetails);
+         setDisable(false)
         //  console.log("checkout id data ",);
        
       }
@@ -85,7 +89,7 @@ const PaymentForm = ({ checkoutToken, nextStep, backStep, shippingData, onCaptur
             <br /> <br />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Button variant="outlined" onClick={backStep}>Back</Button>
-              <Button type="submit" variant="contained" disabled={!stripe} color="primary">
+              <Button  type="submit" variant="contained" disabled={!stripe || isDisable} color="primary">
                 Pay {checkoutToken.subtotal.formatted_with_symbol}
               </Button>
             </div>
